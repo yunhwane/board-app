@@ -1,6 +1,8 @@
 package kuke.board.article.controller;
 
+import kuke.board.article.entity.Article;
 import kuke.board.article.service.request.ArticleCreateRequest;
+import kuke.board.article.service.response.ArticlePageResponse;
 import kuke.board.article.service.response.ArticleResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,6 +20,20 @@ class ArticleApiTest {
         ));
 
         System.out.println("response : " + articleResponse);
+    }
+
+    @Test
+    void readAllTest() {
+        ArticlePageResponse articlePageResponse = restClient.get()
+                .uri("/v1/articles?boardId=1&pageSize=30&page=50000")
+                .retrieve()
+                .body(ArticlePageResponse.class);
+
+        System.out.println("response.getArticleCount() : " + articlePageResponse.getArticleCount());
+
+        for(ArticleResponse article : articlePageResponse.getArticles()) {
+            System.out.println("articleId = " + article.getArticleId());
+        }
     }
 
     @Test
@@ -57,6 +73,8 @@ class ArticleApiTest {
                 .retrieve()
                 .body(ArticleResponse.class);
     }
+
+
 
     ArticleResponse create(ArticleCreateRequest request) {
         return restClient.post()
