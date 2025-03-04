@@ -11,6 +11,8 @@ import kuke.board.article.service.response.ArticleResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class ArticleController {
@@ -30,6 +32,15 @@ public class ArticleController {
         return articleService.readAll(boardId, page, pageSize);
     }
 
+    @GetMapping("/v1/articles/infinite-scroll")
+    public List<ArticleResponse> readAllInfiniteScroll(
+            @RequestParam("boardId") Long boardId,
+            @RequestParam("pageSize") Long pageSize,
+            @RequestParam(value = "lastArticleId", required = false) Long lastArticleId
+    ) {
+        return articleService.readInfiniteScroll(boardId, pageSize, lastArticleId);
+    }
+
     @PostMapping("/v1/articles")
     public ArticleResponse create(@RequestBody ArticleCreateRequest request) {
         return articleService.create(request);
@@ -44,4 +55,6 @@ public class ArticleController {
     public void delete(@PathVariable Long articleId) {
         articleService.delete(articleId);
     }
+
+
 }
