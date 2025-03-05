@@ -5,10 +5,14 @@ import jakarta.transaction.Transactional;
 import kuke.board.comment.entity.Comment;
 import kuke.board.comment.repository.CommentRepository;
 import kuke.board.comment.service.request.CommentCreateRequest;
+import kuke.board.comment.service.response.CommentPageResponse;
 import kuke.board.comment.service.response.CommentResponse;
 import kuke.board.common.snowflake.Snowflake;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.function.Predicate.not;
 
@@ -80,5 +84,23 @@ import static java.util.function.Predicate.not;
                         .ifPresent(this::delete);
             }
         }
+
+        public CommentPageResponse readAll(Long articleId, Long page, Long pageSize) {
+            return CommentPageResponse.of(
+                    commentRepository.findAll(articleId, (page - 1) * pageSize, pageSize).stream()
+                            .map(CommentResponse::from)
+                            .toList(),
+
+                    commentRepository.count(articleId, PageLimitCalculator.calculatePageLimit(page, pageSize, 10L)));
+        }
+
+        public List<CommentResponse> readAll(Long articleId, Long lastCommentParentId, Long lastCommentId, Long limit) {
+            List<Comment> comments = lastCommentParentId == null || lastCommentId == null ?
+                    commentRepository.findAllInfiniteScroll(articleId, limit) :
+                    commentRepository.findAllInfiniteScroll(articleId, lastCommentParentId, lastCommentId, limit);
+
+            return comments.stream().map(CommentResponse::from).toList();
+        }
+
     }
 
