@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: kuke-board-article-service
+    name: kuke-board-comment-service
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
