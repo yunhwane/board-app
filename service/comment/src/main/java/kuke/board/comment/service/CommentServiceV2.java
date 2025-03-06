@@ -2,8 +2,10 @@ package kuke.board.comment.service;
 
 
 import jakarta.transaction.Transactional;
+import kuke.board.comment.entity.ArticleCommentCount;
 import kuke.board.comment.entity.CommentPath;
 import kuke.board.comment.entity.CommentV2;
+import kuke.board.comment.repository.ArticleCommentCountRepository;
 import kuke.board.comment.repository.CommentRepositoryV2;
 import kuke.board.comment.service.request.CommentCreateRequestV2;
 import kuke.board.comment.service.response.CommentPageResponse;
@@ -23,6 +25,7 @@ public class CommentServiceV2 {
 
     private final Snowflake snowflake = new Snowflake();
     private final CommentRepositoryV2 commentRepository;
+    private final ArticleCommentCountRepository articleCommentCountRepository;
 
 
     @Transactional
@@ -41,6 +44,14 @@ public class CommentServiceV2 {
                         )
                 )
         );
+
+        int result = articleCommentCountRepository.increase(request.getArticleId());
+
+        if(result == 0) {
+            articleCommentCountRepository.save(
+                    ArticleCommentCount.init(request.getArticleId(), 1L)
+            );
+        }
 
         return CommentResponse.from(comment);
     }
@@ -81,11 +92,12 @@ public class CommentServiceV2 {
                         delete(comment);
                     }
                 }
-
                 );
+
     }
     private void delete(CommentV2 commentV2) {
         commentRepository.delete(commentV2);
+        articleCommentCountRepository.decrease(commentV2.getArticleId());
         if (!commentV2.isRoot()) {
             commentRepository.findByPath(commentV2.getCommentPath().getParentPath())
                     .filter(CommentV2::getDeleted)
@@ -112,5 +124,11 @@ public class CommentServiceV2 {
         return commentRepository.findByPath(parentPath)
                 .filter(not(CommentV2::getDeleted))
                 .orElseThrow();
+    }
+
+    public Long count(Long articleId) {
+        return articleCommentCountRepository.findById(articleId)
+                .map(ArticleCommentCount::getCommentCount)
+                .orElse(0L);
     }
 }
