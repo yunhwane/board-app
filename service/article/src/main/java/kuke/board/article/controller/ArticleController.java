@@ -1,8 +1,6 @@
 package kuke.board.article.controller;
 
 
-import kuke.board.article.entity.Article;
-import kuke.board.article.repository.ArticleRepository;
 import kuke.board.article.service.ArticleService;
 import kuke.board.article.service.request.ArticleCreateRequest;
 import kuke.board.article.service.request.ArticleUpdateRequest;
@@ -22,6 +20,12 @@ public class ArticleController {
     public ArticleResponse read(@PathVariable Long articleId) {
         return articleService.read(articleId);
     }
+
+    @GetMapping("/v1/articles/boards/{boardId}/count")
+    public Long count(@PathVariable Long boardId) {
+        return articleService.count(boardId);
+    }
+
 
     @GetMapping("/v1/articles")
     public ArticlePageResponse readAll(
