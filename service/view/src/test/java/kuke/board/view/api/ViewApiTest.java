@@ -21,7 +21,7 @@ public class ViewApiTest {
         for(int i = 0; i < 10000; i++) {
             executorService.submit(() -> {
                 restClient.post()
-                        .uri("/v1/article-view/articles/{articleId}/user/{userId}", 2L, 1L)
+                        .uri("/v1/article-view/articles/{articleId}/user/{userId}", 7L, 1L)
                         .retrieve()
                         .toBodilessEntity();
 
@@ -32,7 +32,7 @@ public class ViewApiTest {
         latch.await();
 
         Long count = restClient.get()
-                .uri("/v1/article-view/articles/{articleId}/count", 2L)
+                .uri("/v1/article-view/articles/{articleId}/count", 7L)
                 .retrieve()
                 .body(Long.class);
 
