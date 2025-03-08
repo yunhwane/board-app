@@ -30,6 +30,7 @@ allprojects {
     }
 
     dependencies {
+        implementation 'ch.qos.logback:logback-classic'
         compileOnly 'org.projectlombok:lombok'
         testCompileOnly 'org.projectlombok:lombok'
         developmentOnly 'org.springframework.boot:spring-boot-devtools'
